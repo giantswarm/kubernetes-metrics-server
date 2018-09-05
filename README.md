@@ -1,5 +1,5 @@
 # kubernetes-metrics-server
-Helm chart for Kubernetes Metrics Server running in Guest Clusters
+Helm chart for Kubernetes Metrics Server running in Tenant Clusters
 
 
 * Installs the [kubernetes-metrics-server](https://github.com/kubernetes-incubator/metrics-server)
@@ -20,4 +20,4 @@ Provide a custom `values.yaml`:
 $ helm install kubernetes-metrics-server-chart -f values.yaml
 ```
 
-Deployment to Guest Clusters is handled by [chart-operator](https://github.com/giantswarm/chart-operator).
+Deployment to Tenant Clusters is handled by [chart-operator](https://github.com/giantswarm/chart-operator).
