@@ -6,12 +6,10 @@
   packages = [
     "autorest",
     "autorest/adal",
-    "autorest/date",
-    "logger",
-    "version"
+    "autorest/date"
   ]
-  revision = "a35eae345f69bbfbe3b8fa0b1d3fe98f8430b21a"
-  version = "v10.15.3"
+  revision = "fc3b03a2d2d1f43fad3007038bd16f044f870722"
+  version = "v9.10.0"
 
 [[projects]]
   name = "github.com/BurntSushi/toml"
@@ -56,13 +54,13 @@
   version = "v3.2.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/docker/distribution"
   packages = [
-    "digest",
+    "digestset",
     "reference"
   ]
-  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
-  version = "v2.6.2"
+  revision = "9930542dc51fa2223216d08cc4745a6900153284"
 
 [[projects]]
   name = "github.com/docker/docker"
@@ -375,6 +373,12 @@
   packages = ["."]
   revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
   version = "1.0.1"
+
+[[projects]]
+  name = "github.com/opencontainers/go-digest"
+  packages = ["."]
+  revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
+  version = "v1.0.0-rc1"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -1054,6 +1058,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7a8b6e6b793d6d65335307a1e63be5c718e133164ebf122593728b6fc5c9fed2"
+  inputs-digest = "cd34bb0f26c3af8901f4f3125fc622f26a4a7c298e9861697e26f8906f096b6b"
   solver-name = "gps-cdcl"
   solver-version = 1

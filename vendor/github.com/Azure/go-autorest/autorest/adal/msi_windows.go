@@ -1,4 +1,6 @@
-package version
+// +build windows
+
+package adal
 
 // Copyright 2017 Microsoft Corporation
 //
@@ -15,23 +17,9 @@ package version
 //  limitations under the License.
 
 import (
-	"fmt"
-	"runtime"
+	"os"
+	"strings"
 )
 
-// Number contains the semantic version of this SDK.
-const Number = "v10.15.3"
-
-var (
-	userAgent = fmt.Sprintf("Go/%s (%s-%s) go-autorest/%s",
-		runtime.Version(),
-		runtime.GOARCH,
-		runtime.GOOS,
-		Number,
-	)
-)
-
-// UserAgent returns a string containing the Go version, system archityecture and OS, and the go-autorest version.
-func UserAgent() string {
-	return userAgent
-}
+// msiPath is the path to the MSI Extension settings file (to discover the endpoint)
+var msiPath = strings.Join([]string{os.Getenv("SystemDrive"), "WindowsAzure/Config/ManagedIdentity-Settings"}, "/")
