@@ -176,12 +176,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/giantswarm/kubernetes-coredns"
-  packages = ["integration/templates"]
-  revision = "f5315bd76352c4fb160fba614eadd42c443f4471"
-
-[[projects]]
-  branch = "master"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   revision = "5f43dec2d9e50a4c7c869d17a8f0a9dba2edc177"
@@ -1043,6 +1037,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a908f23baf7c27bfeeeb5900b80da8276e79368ac9eea33df6965b6ffacda9b5"
+  inputs-digest = "8e8b20e54f1dc34fa1cbca686a078a465d37c36455a264321cf79c6c3d1b737d"
   solver-name = "gps-cdcl"
   solver-version = 1

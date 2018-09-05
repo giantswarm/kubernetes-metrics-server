@@ -47,10 +47,6 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/giantswarm/kubernetes-coredns"
-
-[[constraint]]
-  branch = "master"
   name = "github.com/giantswarm/micrologger"
 
 [[constraint]]
