@@ -120,11 +120,11 @@ func init() {
 						Namespace: metav1.NamespaceSystem,
 						Labels: map[string]string{
 							"giantswarm.io/service-type": "managed",
-							"k8s-app":                    metricsServerName,
-							"kubernetes.io/name":         "metrics-server",
+							"app":                metricsServerName,
+							"kubernetes.io/name": "metrics-server",
 						},
 						MatchLabels: map[string]string{
-							"k8s-app": metricsServerName,
+							"app": metricsServerName,
 						},
 						Replicas: 1,
 					},
