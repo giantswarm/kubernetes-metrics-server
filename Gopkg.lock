@@ -2,6 +2,18 @@
 
 
 [[projects]]
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/date",
+    "logger",
+    "version"
+  ]
+  revision = "a35eae345f69bbfbe3b8fa0b1d3fe98f8430b21a"
+  version = "v10.15.3"
+
+[[projects]]
   name = "github.com/BurntSushi/toml"
   packages = ["."]
   revision = "b26d9c308763d68093482582cea63d69be07a0f0"
@@ -36,6 +48,12 @@
   packages = ["spew"]
   revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
   version = "v1.1.1"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   name = "github.com/docker/distribution"
@@ -632,7 +650,6 @@
     "pkg/api/meta",
     "pkg/api/resource",
     "pkg/api/validation",
-    "pkg/api/validation/path",
     "pkg/apimachinery",
     "pkg/apimachinery/announced",
     "pkg/apimachinery/registered",
@@ -686,7 +703,6 @@
   version = "kubernetes-1.10.4"
 
 [[projects]]
-  branch = "master"
   name = "k8s.io/apiserver"
   packages = [
     "pkg/apis/audit",
@@ -697,7 +713,8 @@
     "pkg/features",
     "pkg/util/feature"
   ]
-  revision = "e9312c15296b6c2c923ebd5031ff5d1d5fd022d7"
+  revision = "8378ef881d4fa7d3ca5c5e7e5309592ec69b11e4"
+  version = "kubernetes-1.10.4"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -1037,6 +1054,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e8b20e54f1dc34fa1cbca686a078a465d37c36455a264321cf79c6c3d1b737d"
+  inputs-digest = "7a8b6e6b793d6d65335307a1e63be5c718e133164ebf122593728b6fc5c9fed2"
   solver-name = "gps-cdcl"
   solver-version = 1
