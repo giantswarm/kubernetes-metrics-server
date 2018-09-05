@@ -5,11 +5,11 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     giantswarm.io/service-type: {{ .Values.serviceType }}
-    k8s-app: {{ .Values.k8sAppLabel }}
+    app: {{ .Values.k8sAppLabel }}
 spec:
   selector:
     matchLabels:
-      k8s-app: {{ .Values.k8sAppLabel }}
+      app: {{ .Values.k8sAppLabel }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,7 +19,7 @@ spec:
     metadata:
       labels:
         giantswarm.io/service-type: {{ .Values.serviceType }}
-        k8s-app: {{ .Values.k8sAppLabel }}
+        app: {{ .Values.k8sAppLabel }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       priorityClassName: system-cluster-critical
