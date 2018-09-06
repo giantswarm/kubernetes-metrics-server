@@ -1,6 +1,6 @@
 // +build k8srequired
 
-package basic
+package metrics
 
 import (
 	"context"
@@ -20,6 +20,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/client-go/rest"
 )
 
 const (
@@ -36,6 +40,7 @@ var (
 	h          *framework.Host
 	helmClient *helmclient.Client
 	l          micrologger.Logger
+	r          *rest.RESTClient
 )
 
 func init() {
@@ -120,8 +125,7 @@ func init() {
 						Namespace: metav1.NamespaceSystem,
 						Labels: map[string]string{
 							"giantswarm.io/service-type": "managed",
-							"app":                metricsServerName,
-							"kubernetes.io/name": "metrics-server",
+							"app": metricsServerName,
 						},
 						MatchLabels: map[string]string{
 							"app": metricsServerName,
@@ -136,6 +140,7 @@ func init() {
 			panic(err.Error())
 		}
 	}
+
 }
 
 // TestMain allows us to have common setup and teardown steps that are run
@@ -155,4 +160,24 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 	}
+}
+
+// setConfigDefaults is copied and adjusted from client-go core/v1.
+func setConfigDefaults(config *rest.Config) error {
+	if config.GroupVersion == nil {
+		config.GroupVersion = &schema.GroupVersion{Group: "metrics.k8s.io", Version: "v1beta1"}
+	}
+	if config.APIPath == "" {
+		config.APIPath = "/apis"
+	}
+	if config.NegotiatedSerializer == nil {
+		s := runtime.NewScheme()
+		c := serializer.NewCodecFactory(s)
+		config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: c}
+	}
+	if config.UserAgent == "" {
+		config.UserAgent = rest.DefaultKubernetesUserAgent()
+	}
+
+	return nil
 }
