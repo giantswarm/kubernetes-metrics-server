@@ -57,6 +57,12 @@ jobs:
       TEST_NAME: "basic"
     <<: *e2eTest
 
+  e2eTestMetrics:
+    environment:
+      TEST_DIR: "integration/test/metrics"
+      TEST_NAME: "metrics"
+    <<: *e2eTest
+
   deploy:
     machine: true
     steps:
@@ -91,12 +97,17 @@ workflows:
           requires:
           - build
 
+      - e2eTestMetrics:
+          requires:
+          - e2eTestBasic
+
       - deploy:
           filters:
             branches:
               only: master
           requires:
           - e2eTestBasic
+          - e2eTestMetrics
 
       - publish_to_stable:
           filters:
