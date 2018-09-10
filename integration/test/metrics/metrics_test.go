@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"k8s.io/helm/pkg/helm"
+
 	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2esetup/chart/env"
 	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
@@ -42,6 +44,9 @@ func TestMetrics(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not get metrics: %v", err)
 	}
+
+	// Delete release
+	err = helmClient.DeleteRelease(chartName, helm.DeletePurge(true))
 }
 
 func checkMetricsAvailability(ctx context.Context) error {
