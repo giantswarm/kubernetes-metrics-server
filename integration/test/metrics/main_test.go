@@ -11,6 +11,7 @@ import (
 	"github.com/giantswarm/apprclient"
 	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2e-harness/pkg/framework/deployment"
+	"github.com/giantswarm/e2e-harness/pkg/framework/resource"
 	e2esetup "github.com/giantswarm/e2esetup/chart"
 	"github.com/giantswarm/e2esetup/chart/env"
 	"github.com/giantswarm/e2etests/managedservices"
@@ -27,7 +28,7 @@ import (
 )
 
 const (
-	testName = "basic"
+	testName = "metrics"
 
 	metricsServerName = "metrics-server"
 	chartName         = "kubernetes-metrics-server"
@@ -40,7 +41,7 @@ var (
 	h          *framework.Host
 	helmClient *helmclient.Client
 	l          micrologger.Logger
-	r          *rest.RESTClient
+	r          *resource.Resource
 )
 
 func init() {
@@ -141,6 +142,15 @@ func init() {
 		}
 	}
 
+	resourceConfig := resource.ResourceConfig{
+		Logger:     l,
+		HelmClient: helmClient,
+		Namespace:  metav1.NamespaceSystem,
+	}
+	r, err = resource.New(resourceConfig)
+	if err != nil {
+		panic(err.Error())
+	}
 }
 
 // TestMain allows us to have common setup and teardown steps that are run

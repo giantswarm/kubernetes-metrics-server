@@ -3,8 +3,12 @@
 package metrics
 
 import (
+	"fmt"
 	"k8s.io/client-go/rest"
 	"testing"
+
+	"github.com/giantswarm/e2esetup/chart/env"
+	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
 )
 
 const (
@@ -14,8 +18,20 @@ const (
 // TestMetrics ensures that deployed metrics-server chart exposes node-metrics
 // via Kubernetes API extension.
 func TestMetrics(t *testing.T) {
+	// Install resource
+	err := r.InstallResource(chartName, templates.MetricsServerValues, fmt.Sprintf("%s-%s", env.CircleSHA(), testName))
+	if err != nil {
+		t.Fatalf("could not install resource: %v", err)
+	}
+
+	// Wait for deployed status
+	err = r.WaitForStatus(chartName, "DEPLOYED")
+	if err != nil {
+		t.Fatalf("timeout waiting for deployed resource: %v", err)
+	}
+
 	// Check metrics availability
-	err := checkMetricsAvailability()
+	err = checkMetricsAvailability()
 	if err != nil {
 		t.Fatalf("could not get metrics: %v", err)
 	}
