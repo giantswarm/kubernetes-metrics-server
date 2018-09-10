@@ -5,17 +5,19 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"k8s.io/client-go/rest"
 	"testing"
 	"time"
 
+	"github.com/giantswarm/backoff"
 	"github.com/giantswarm/e2esetup/chart/env"
-
 	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
+	"github.com/giantswarm/microerror"
 )
 
 const (
+	longMaxInterval    = 2 * time.Minute
 	metricsAPIEndpoint = "/apis/metrics.k8s.io/v1beta1"
+	shortMaxInterval   = 5 * time.Second
 )
 
 // TestMetrics ensures that deployed metrics-server chart exposes node-metrics
@@ -35,26 +37,38 @@ func TestMetrics(t *testing.T) {
 		t.Fatalf("timeout waiting for deployed resource: %v", err)
 	}
 
-	// Wait 1 minute for metrics become available
-	l.LogCtx(ctx, "level", "info", "message", "waiting 1 minute for metrics become available")
-	time.Sleep(1 * time.Minute)
-
 	// Check metrics availability
-	err = checkMetricsAvailability()
+	err = checkMetricsAvailability(ctx)
 	if err != nil {
 		t.Fatalf("could not get metrics: %v", err)
 	}
 }
 
-func checkMetricsAvailability() error {
+func checkMetricsAvailability(ctx context.Context) error {
+	var err error
 
-	restConfig := h.RestConfig()
-	restClient, err := rest.RESTClientFor(restConfig)
-	stream, err := restClient.Get().RequestURI(metricsAPIEndpoint).Stream()
-	if err != nil {
-		return err
+	restClient := h.K8sClient().CoreV1().RESTClient()
+
+	l.LogCtx(ctx, "level", "debug", "message", "waiting for the metrics become available")
+
+	o := func() error {
+
+		_, err := restClient.Get().RequestURI(metricsAPIEndpoint).Stream()
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
-	defer stream.Close()
+	b := backoff.NewConstant(longMaxInterval, shortMaxInterval)
+	n := backoff.NewNotifier(l, ctx)
+
+	err = backoff.RetryNotify(o, b, n)
+	if err != nil {
+		return microerror.Mask(err)
+	}
+
+	l.LogCtx(ctx, "level", "debug", "message", "successfully retrieved metrics from metrics server")
 
 	return nil
 }
