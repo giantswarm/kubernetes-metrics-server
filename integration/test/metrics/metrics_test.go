@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/giantswarm/e2esetup/chart/env"
+
 	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
 )
 
