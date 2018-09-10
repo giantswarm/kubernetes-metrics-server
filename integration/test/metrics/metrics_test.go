@@ -47,6 +47,9 @@ func TestMetrics(t *testing.T) {
 
 	// Delete release
 	err = helmClient.DeleteRelease(chartName, helm.DeletePurge(true))
+	if err != nil {
+		t.Fatalf("failed to teardown resource: %v", err)
+	}
 }
 
 func checkMetricsAvailability(ctx context.Context) error {
