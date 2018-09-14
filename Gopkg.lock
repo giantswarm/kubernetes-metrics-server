@@ -164,7 +164,7 @@
     "chart",
     "chart/env"
   ]
-  revision = "d69cd345fbb3e1b1c7f092cf009d0c92806ce2bb"
+  revision = "649469c2d54fba4bf86b3e9bca96bd47435461ae"
 
 [[projects]]
   branch = "master"
@@ -1058,6 +1058,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "cd34bb0f26c3af8901f4f3125fc622f26a4a7c298e9861697e26f8906f096b6b"
+  inputs-digest = "0d8d0ede10edc0173e11bec2c08ce150521167cb40a80e91c9b316c4ed2c7f70"
   solver-name = "gps-cdcl"
   solver-version = 1
