@@ -164,7 +164,7 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			l.LogCtx(ctx, "level", "error", "message", "e2e test failed", "stack", fmt.Sprintf("%#v\n", err))
 		}
-			
+
 		os.Exit(v)
 	}
 }
