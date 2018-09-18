@@ -11,8 +11,8 @@ import (
 	"k8s.io/helm/pkg/helm"
 
 	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
 	"github.com/giantswarm/e2esetup/chart/env"
+	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
 	"github.com/giantswarm/microerror"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,30 +32,30 @@ func TestMigration(t *testing.T) {
 	ctx := context.Background()
 
 	// Install legacy resources.
-	err := framework.HelmCmd("install /e2e/fixtures/resources-chart -n resources")
+	err := helmClient.InstallFromTarball("/e2e/fixtures/resources-chart", resourceNamespace, helm.ReleaseName("resources"))
 	if err != nil {
 		t.Fatalf("could not install resources chart: %v", err)
 	}
-	defer framework.HelmCmd("delete resources --purge")
+	defer helmClient.DeleteRelease("resources", helm.DeletePurge(true))
 
 	// Check legacy resources are present.
 	err = checkLegacyResourcesPresent()
 	if err != nil {
-		t.Fatalf("could check legacy resources present: %v", err)
+		t.Fatalf("legacy resources not present: %v", err)
 	}
+
 	// Check managed resources are not present.
 	err = checkManagedResourcesNotPresent("app=metrics-server,giantswarm.io/service-type=managed")
 	if err != nil {
-		t.Fatalf("could check managed resources not present: %v", err)
+		t.Fatalf("managed resources present: %v", err)
 	}
 
 	// Install kubernetes-metrics-server-chart.
-	channel := env.CircleSHA()
-	err = framework.HelmCmd(fmt.Sprintf("registry install --wait quay.io/giantswarm/kubernetes-metrics-server-chart:%s -n test-deploy", channel))
+	channel := fmt.Sprintf("%s-%s", env.CircleSHA(), testName)
+	err = r.Install(chartName, templates.MetricsServerValues, channel)
 	if err != nil {
-		t.Fatalf("could not install kubernetes-kube-state-metrics-chart: %v", err)
+		t.Fatalf("could not install %q %v", chartName, err)
 	}
-	defer framework.HelmCmd("delete test-deploy --purge")
 
 	// Wait for deployed status
 	err = r.WaitForStatus(chartName, "DEPLOYED")
@@ -66,13 +66,13 @@ func TestMigration(t *testing.T) {
 	// Check legacy resources are not present.
 	err = checkLegacyResourcesNotPresent()
 	if err != nil {
-		t.Fatalf("could check legacy resources present: %v", err)
+		t.Fatalf("legacy resources present: %v", err)
 	}
 
 	// Check managed resources are present.
 	err = checkManagedResourcesPresent("app=metrics-server,giantswarm.io/service-type=managed")
 	if err != nil {
-		t.Fatalf("could check managed resources not present: %v", err)
+		t.Fatalf("managed resources not present: %v", err)
 	}
 
 	// Check metrics availability
