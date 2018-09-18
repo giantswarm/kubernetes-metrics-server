@@ -139,19 +139,19 @@ func checkLegacyResourcesPresent() error {
 		return microerror.Newf("failed to get apiservice %s: %v", "v1beta1.metrics.k8s.io", err)
 	}
 
-	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get service account %s: %v", "metrics-server", err)
 	}
 
-	_, err = c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Extensions().Deployments(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get deployment %s: %v", chartName, getOptions)
+		return microerror.Newf("failed to get deployment %s: %v", metricsServerName, getOptions)
 	}
 
-	_, err = c.Core().Services(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().Services(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get service %s: %v", chartName, getOptions)
+		return microerror.Newf("failed to get service %s: %v", metricsServerName, getOptions)
 	}
 
 	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
@@ -198,25 +198,25 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(metricsServerName, getOptions)
 	if err == nil {
-		return microerror.Newf("expected error querying for serviceaccount %s/%s didn't happen", resourceNamespace, chartName)
+		return microerror.Newf("expected error querying for serviceaccount %s/%s didn't happen", resourceNamespace, metricsServerName)
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Extensions().Deployments(resourceNamespace).Get(metricsServerName, getOptions)
 	if err == nil {
-		return microerror.Newf("expected error querying for deployment %s didn't happen", chartName)
+		return microerror.Newf("expected error querying for deployment %s didn't happen", metricsServerName)
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Core().Services(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().Services(resourceNamespace).Get(metricsServerName, getOptions)
 	if err == nil {
-		return microerror.Newf("expected error querying for service %s didn't happen", chartName)
+		return microerror.Newf("expected error querying for service %s didn't happen", metricsServerName)
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
