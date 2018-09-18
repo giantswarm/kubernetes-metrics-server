@@ -4,6 +4,8 @@
 
 name: metrics-server-migration
 namespace: kube-system
+serviceType: managed
+k8sAppLabel: metrics-server
 
 image:
   registry: quay.io
