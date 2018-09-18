@@ -63,7 +63,7 @@ func New(config Config) (*ManagedServices, error) {
 
 	var resource *frameworkresource.Resource
 	{
-		c := frameworkresource.ResourceConfig{
+		c := frameworkresource.Config{
 			ApprClient: config.ApprClient,
 			HelmClient: config.HelmClient,
 			Logger:     config.Logger,
@@ -96,7 +96,7 @@ func (ms *ManagedServices) Test(ctx context.Context) error {
 	{
 		ms.logger.LogCtx(ctx, "level", "debug", "message", fmt.Sprintf("installing chart %#q", ms.chartConfig.ChartName))
 
-		err = ms.resource.InstallResource(ms.chartConfig.ChartName, ms.chartConfig.ChartValues, ms.chartConfig.ChannelName)
+		err = ms.resource.Install(ms.chartConfig.ChartName, ms.chartConfig.ChartValues, ms.chartConfig.ChannelName)
 		if err != nil {
 			return microerror.Mask(err)
 		}

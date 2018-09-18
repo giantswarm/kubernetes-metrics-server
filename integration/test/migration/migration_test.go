@@ -118,46 +118,48 @@ func checkMetricsAvailability(ctx context.Context) error {
 }
 
 func checkLegacyResourcesPresent() error {
+	var err error
+
 	c := h.K8sClient()
 	ac := h.K8sAggregationClient()
 	getOptions := metav1.GetOptions{}
 
-	crba, err := c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
+	_, err = c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get clusterrolebinding %s: %v", "metrics-server:system:auth-delegator", err)
 	}
 
-	rba, err := c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
+	_, err = c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get rolebinding %s/%s: %v", resourceNamespace, "metrics-server-auth-reader", err)
 	}
 
-	as, err := ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
+	_, err = ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get apiservice %s: %v", "v1beta1.metrics.k8s.io", err)
 	}
 
-	sa, err := c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get service account %s: %v", "metrics-server", err)
 	}
 
-	d, err := c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get deployment %s: %v", chartName, getOptions)
 	}
 
-	s, err := c.Core().Services(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().Services(resourceNamespace).Get(chartName, getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get service %s: %v", chartName, getOptions)
 	}
 
-	cr, err := c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
+	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get clusterrole %s: %v", "system:metrics-server", err)
 	}
 
-	crb, err := c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
+	_, err = c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
 	if err != nil {
 		return microerror.Newf("failed to get clusterrolebinding %s: %v", "system:metrics-server", err)
 	}
@@ -166,11 +168,13 @@ func checkLegacyResourcesPresent() error {
 }
 
 func checkLegacyResourcesNotPresent() error {
+	var err error
+
 	c := h.K8sClient()
 	ac := h.K8sAggregationClient()
 	getOptions := metav1.GetOptions{}
 
-	crba, err := c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
+	_, err = c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for clusterrolebinding %s didn't happen", "metrics-server:system:auth-delegator")
 	}
@@ -178,7 +182,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	rba, err := c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
+	_, err = c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for rolebinding %s/%s didn't happen", resourceNamespace, "metrics-server-auth-reader")
 	}
@@ -186,7 +190,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	as, err := ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
+	_, err = ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for apiservice %s didn't happen", "v1beta1.metrics.k8s.io")
 	}
@@ -194,7 +198,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	sa, err := c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(chartName, getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for serviceaccount %s/%s didn't happen", resourceNamespace, chartName)
 	}
@@ -202,7 +206,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	d, err := c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Extensions().Deployments(resourceNamespace).Get(chartName, getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for deployment %s didn't happen", chartName)
 	}
@@ -210,7 +214,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	s, err := c.Core().Services(resourceNamespace).Get(chartName, getOptions)
+	_, err = c.Core().Services(resourceNamespace).Get(chartName, getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for service %s didn't happen", chartName)
 	}
@@ -218,7 +222,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	cr, err := c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
+	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for clusterrole %s didn't happen", "system:metrics-server")
 	}
@@ -226,7 +230,7 @@ func checkLegacyResourcesNotPresent() error {
 		return microerror.Mask(err)
 	}
 
-	crb, err := c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
+	_, err = c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
 	if err == nil {
 		return microerror.Newf("expected error querying for clusterrolebinding %s didn't happen", "system:metrics-server")
 	}
