@@ -22,6 +22,7 @@ rules:
   resources:
   - clusterrolebindings
   - clusterroles
+  - rolebindings
   verbs:
   - "get"
   - "delete"
