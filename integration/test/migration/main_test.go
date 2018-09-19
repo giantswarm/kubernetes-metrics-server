@@ -24,10 +24,9 @@ import (
 )
 
 const (
-	testName = "migration"
-
-	metricsServerName = "metrics-server"
 	chartName         = "kubernetes-metrics-server"
+	metricsServerName = "metrics-server"
+	testName          = "migration"
 )
 
 var (
