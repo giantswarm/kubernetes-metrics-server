@@ -49,24 +49,39 @@ data:
         },
         {
             "kind": "APIService",
-            "name": "v1beta1.metrics.k8s.io"
+            "name": "v1beta1.metrics.k8s.io",
+            "excludeLabels": {
+                "giantswarm.io/service-type": "managed"
+            }
         },
         {
             "kind": "ClusterRoleBinding",
-            "name": "metrics-server:system:auth-delegator"
+            "name": "metrics-server:system:auth-delegator",
+            "excludeLabels": {
+                "giantswarm.io/service-type": "managed"
+            }
         },
         {
             "kind": "ClusterRoleBinding",
-            "name": "system:metrics-server"
+            "name": "system:metrics-server",
+            "excludeLabels": {
+                "giantswarm.io/service-type": "managed"
+            }
         },
         {
             "kind": "RoleBinding",
             "name": "metrics-server-auth-reader",
-            "namespace": "kube-system"
+            "namespace": "kube-system",
+            "excludeLabels": {
+                "giantswarm.io/service-type": "managed"
+            }
         },
         {
             "kind": "ClusterRole",
-            "name": "system:metrics-server"
+            "name": "system:metrics-server",
+            "excludeLabels": {
+                "giantswarm.io/service-type": "managed"
+            }
         },
         {
             "kind": "ServiceAccount",
