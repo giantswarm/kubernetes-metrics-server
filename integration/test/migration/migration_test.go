@@ -36,7 +36,6 @@ func TestMigration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not install resources chart: %v", err)
 	}
-	defer helmClient.DeleteRelease("resources", helm.DeletePurge(true))
 
 	// Check legacy resources are present.
 	err = checkLegacyResourcesPresent()
@@ -64,7 +63,7 @@ func TestMigration(t *testing.T) {
 	}
 
 	// Check legacy resources are not present.
-	err = checkLegacyResourcesNotPresent()
+	err = checkLegacyResourcesNotPresent("app!=metrics-server,giantswarm.io/service-type!=managed")
 	if err != nil {
 		t.Fatalf("legacy resources present: %v", err)
 	}
@@ -167,72 +166,66 @@ func checkLegacyResourcesPresent() error {
 	return nil
 }
 
-func checkLegacyResourcesNotPresent() error {
+func checkLegacyResourcesNotPresent(labelSelector string) error {
 	var err error
 
 	c := h.K8sClient()
 	ac := h.K8sAggregationClient()
-	getOptions := metav1.GetOptions{}
+	listOptions := metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("k8s-app=metrics-server,%s", labelSelector),
+	}
 
-	_, err = c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for clusterrolebinding %s didn't happen", "metrics-server:system:auth-delegator")
+	crb, err := c.Rbac().ClusterRoleBindings().List(listOptions)
+	if err == nil && len(crb.Items) > 0 {
+		return microerror.New("expected error querying for legacy clusterrolebindings didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for rolebinding %s/%s didn't happen", resourceNamespace, "metrics-server-auth-reader")
+	rb, err := c.Rbac().RoleBindings(resourceNamespace).List(listOptions)
+	if err == nil && len(rb.Items) > 0 {
+		return microerror.New("expected error querying for legacy rolebinding didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for apiservice %s didn't happen", "v1beta1.metrics.k8s.io")
+	as, err := ac.ApiregistrationV1beta1().APIServices().List(listOptions)
+	if err == nil && len(as.Items) > 0 {
+		return microerror.New("expected error querying for legacy apiservice didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(metricsServerName, getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for serviceaccount %s/%s didn't happen", resourceNamespace, metricsServerName)
+	sa, err := c.Core().ServiceAccounts(resourceNamespace).List(listOptions)
+	if err == nil && len(sa.Items) > 0 {
+		return microerror.New("expected error querying for legacy serviceaccount didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Extensions().Deployments(resourceNamespace).Get(metricsServerName, getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for deployment %s didn't happen", metricsServerName)
+	d, err := c.Extensions().Deployments(resourceNamespace).List(listOptions)
+	if err == nil && len(d.Items) > 0 {
+		return microerror.New("expected error querying for legacy deployment didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Core().Services(resourceNamespace).Get(metricsServerName, getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for service %s didn't happen", metricsServerName)
+	s, err := c.Core().Services(resourceNamespace).List(listOptions)
+	if err == nil && len(s.Items) > 0 {
+		return microerror.New("expected error querying for legacy service didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
 	}
 
-	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for clusterrole %s didn't happen", "system:metrics-server")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	_, err = c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
-	if err == nil {
-		return microerror.Newf("expected error querying for clusterrolebinding %s didn't happen", "system:metrics-server")
+	cr, err := c.Rbac().ClusterRoles().List(listOptions)
+	if err == nil && len(cr.Items) > 0 {
+		return microerror.New("expected error querying for legacy clusterrole didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -316,7 +309,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	crba, err := c.Rbac().ClusterRoleBindings().List(listOptions)
 	if err == nil && len(crba.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed clusterrolebindings didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -324,7 +317,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	rba, err := c.Rbac().RoleBindings(resourceNamespace).List(listOptions)
 	if err == nil && len(rba.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed rolebindings didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -332,7 +325,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	as, err := ac.ApiregistrationV1beta1().APIServices().List(listOptions)
 	if err == nil && len(as.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed apiservice didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -340,7 +333,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	sa, err := c.Core().ServiceAccounts(resourceNamespace).List(listOptions)
 	if err == nil && len(sa.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed serviceaccount didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -348,7 +341,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	d, err := c.Extensions().Deployments(resourceNamespace).List(listOptions)
 	if err == nil && len(d.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed deployment didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -356,7 +349,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	s, err := c.Core().Services(resourceNamespace).List(listOptions)
 	if err == nil && len(s.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed service didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
@@ -364,7 +357,7 @@ func checkManagedResourcesNotPresent(labelSelector string) error {
 
 	cr, err := c.Rbac().ClusterRoles().List(listOptions)
 	if err == nil && len(cr.Items) > 0 {
-		return microerror.New("expected error querying for rolebindings didn't happen")
+		return microerror.New("expected error querying for managed clusterrole didn't happen")
 	}
 	if !apierrors.IsNotFound(err) {
 		return microerror.Mask(err)
