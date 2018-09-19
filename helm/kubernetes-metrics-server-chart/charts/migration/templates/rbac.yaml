@@ -37,7 +37,7 @@ rules:
 - apiGroups:
   - "apiregistration.k8s.io"
   resources:
-  - apiservice
+  - apiservices
   verbs:
   - "get"
   - "delete"
