@@ -28,7 +28,7 @@ func TestMetrics(t *testing.T) {
 	ctx := context.Background()
 
 	// Install resource
-	err := r.InstallResource(chartName, templates.MetricsServerValues, fmt.Sprintf("%s-%s", env.CircleSHA(), testName))
+	err := r.Install(chartName, templates.MetricsServerValues, fmt.Sprintf("%s-%s", env.CircleSHA(), testName))
 	if err != nil {
 		t.Fatalf("could not install resource: %v", err)
 	}
