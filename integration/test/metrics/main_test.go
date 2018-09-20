@@ -52,37 +52,12 @@ func init() {
 	}
 
 	{
-		c := apprclient.Config{
-			Fs:     afero.NewOsFs(),
-			Logger: l,
-
-			Address:      "https://quay.io",
-			Organization: "giantswarm",
-		}
-		a, err = apprclient.New(c)
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-
-	{
 		c := framework.HostConfig{
 			Logger:     l,
 			ClusterID:  "na",
 			VaultToken: "na",
 		}
 		h, err = framework.NewHost(c)
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-
-	{
-		c := deployment.Config{
-			K8sClient: h.K8sClient(),
-			Logger:    l,
-		}
-		d, err = deployment.New(c)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -96,43 +71,6 @@ func init() {
 			TillerNamespace: "giantswarm",
 		}
 		helmClient, err = helmclient.New(c)
-		if err != nil {
-			panic(err.Error())
-		}
-	}
-
-	{
-		c := managedservices.Config{
-			ApprClient:    a,
-			HelmClient:    helmClient,
-			HostFramework: h,
-			Logger:        l,
-
-			ChartConfig: managedservices.ChartConfig{
-				ChannelName:     fmt.Sprintf("%s-%s", env.CircleSHA(), testName),
-				ChartName:       chartName,
-				ChartValues:     templates.MetricsServerValues,
-				Namespace:       metav1.NamespaceSystem,
-				RunReleaseTests: false,
-			},
-			ChartResources: managedservices.ChartResources{
-				Deployments: []managedservices.Deployment{
-					{
-						Name:      metricsServerName,
-						Namespace: metav1.NamespaceSystem,
-						Labels: map[string]string{
-							"giantswarm.io/service-type": "managed",
-							"app": metricsServerName,
-						},
-						MatchLabels: map[string]string{
-							"app": metricsServerName,
-						},
-						Replicas: 1,
-					},
-				},
-			},
-		}
-		ms, err = managedservices.New(c)
 		if err != nil {
 			panic(err.Error())
 		}

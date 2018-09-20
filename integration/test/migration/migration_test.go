@@ -125,42 +125,42 @@ func checkLegacyResourcesPresent() error {
 
 	_, err = c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get clusterrolebinding %s: %v", "metrics-server:system:auth-delegator", err)
+		return microerror.Newf("failed to get clusterrolebinding %#q: %v", "metrics-server:system:auth-delegator", err)
 	}
 
 	_, err = c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get rolebinding %s/%s: %v", resourceNamespace, "metrics-server-auth-reader", err)
+		return microerror.Newf("failed to get rolebinding %#q/%#q: %v", resourceNamespace, "metrics-server-auth-reader", err)
 	}
 
 	_, err = ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get apiservice %s: %v", "v1beta1.metrics.k8s.io", err)
+		return microerror.Newf("failed to get apiservice %#q: %v", "v1beta1.metrics.k8s.io", err)
 	}
 
 	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get service account %s: %v", "metrics-server", err)
+		return microerror.Newf("failed to get service account %#q: %v", "metrics-server", err)
 	}
 
 	_, err = c.Extensions().Deployments(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get deployment %s: %v", metricsServerName, getOptions)
+		return microerror.Newf("failed to get deployment %#q/%#q: %v", resourceNamespace, metricsServerName, getOptions)
 	}
 
 	_, err = c.Core().Services(resourceNamespace).Get(metricsServerName, getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get service %s: %v", metricsServerName, getOptions)
+		return microerror.Newf("failed to get service %#q/%#q: %v", resourceNamespace, metricsServerName, getOptions)
 	}
 
 	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get clusterrole %s: %v", "system:metrics-server", err)
+		return microerror.Newf("failed to get clusterrole %#q: %v", "system:metrics-server", err)
 	}
 
 	_, err = c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
 	if err != nil {
-		return microerror.Newf("failed to get clusterrolebinding %s: %v", "system:metrics-server", err)
+		return microerror.Newf("failed to get clusterrolebinding %#q: %v", "system:metrics-server", err)
 	}
 
 	return nil
@@ -246,7 +246,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(crba.Items) != 2 {
-		return microerror.Newf("unexpected number of deployments, want 2, got %d", len(crba.Items))
+		return microerror.Newf("unexpected number of clusterrolebindings, want 2, got %d", len(crba.Items))
 	}
 
 	rba, err := c.Rbac().RoleBindings(resourceNamespace).List(listOptions)
@@ -254,7 +254,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(rba.Items) != 1 {
-		return microerror.Newf("unexpected number of deployments, want 1, got %d", len(rba.Items))
+		return microerror.Newf("unexpected number of rolebindings, want 1, got %d", len(rba.Items))
 	}
 
 	as, err := ac.ApiregistrationV1beta1().APIServices().List(listOptions)
@@ -262,7 +262,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(as.Items) != 1 {
-		return microerror.Newf("unexpected number of deployments, want 1, got %d", len(as.Items))
+		return microerror.Newf("unexpected number of apiservices, want 1, got %d", len(as.Items))
 	}
 
 	sa, err := c.Core().ServiceAccounts(resourceNamespace).List(listOptions)
@@ -270,7 +270,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(sa.Items) != 1 {
-		return microerror.Newf("unexpected number of deployments, want 1, got %d", len(sa.Items))
+		return microerror.Newf("unexpected number of serviceaccounts, want 1, got %d", len(sa.Items))
 	}
 
 	d, err := c.Extensions().Deployments(resourceNamespace).List(listOptions)
@@ -286,7 +286,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(s.Items) != 1 {
-		return microerror.Newf("unexpected number of deployments, want 1, got %d", len(s.Items))
+		return microerror.Newf("unexpected number of services, want 1, got %d", len(s.Items))
 	}
 
 	cr, err := c.Rbac().ClusterRoles().List(listOptions)
@@ -294,7 +294,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 		return microerror.Mask(err)
 	}
 	if len(cr.Items) != 1 {
-		return microerror.Newf("unexpected number of deployments, want 1, got %d", len(cr.Items))
+		return microerror.Newf("unexpected number of clusterroles, want 1, got %d", len(cr.Items))
 	}
 
 	return nil
