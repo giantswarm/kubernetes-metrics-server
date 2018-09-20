@@ -18,7 +18,7 @@ apiService:
   insecureSkipTLSVerify: true
 image:
   repository: quay.io/giantswarm/metrics-server-amd64
-  tag: v0.3.0
+  tag: v0.3.1
   pullPolicy: IfNotPresent
 args:
   - --logtostderr
