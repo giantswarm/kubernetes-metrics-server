@@ -38,13 +38,13 @@ func TestMigration(t *testing.T) {
 	}
 
 	// Check legacy resources are present.
-	err = checkLegacyResourcesPresent()
+	err = checkResourcesPresent("k8s-app=metrics-server")
 	if err != nil {
 		t.Fatalf("legacy resources not present: %v", err)
 	}
 
 	// Check managed resources are not present.
-	err = checkManagedResourcesNotPresent("app=metrics-server,giantswarm.io/service-type=managed")
+	err = checkResourcesNotPresent("app=metrics-server,giantswarm.io/service-type=managed")
 	if err != nil {
 		t.Fatalf("managed resources present: %v", err)
 	}
@@ -63,13 +63,13 @@ func TestMigration(t *testing.T) {
 	}
 
 	// Check legacy resources are not present.
-	err = checkLegacyResourcesNotPresent("app!=metrics-server,giantswarm.io/service-type!=managed")
+	err = checkResourcesNotPresent("k8s-app=metrics-service")
 	if err != nil {
 		t.Fatalf("legacy resources present: %v", err)
 	}
 
 	// Check managed resources are present.
-	err = checkManagedResourcesPresent("app=metrics-server,giantswarm.io/service-type=managed")
+	err = checkResourcesPresent("app=metrics-server,giantswarm.io/service-type=managed")
 	if err != nil {
 		t.Fatalf("managed resources not present: %v", err)
 	}
@@ -116,125 +116,7 @@ func checkMetricsAvailability(ctx context.Context) error {
 	return nil
 }
 
-func checkLegacyResourcesPresent() error {
-	var err error
-
-	c := h.K8sClient()
-	ac := h.K8sAggregationClient()
-	getOptions := metav1.GetOptions{}
-
-	_, err = c.Rbac().ClusterRoleBindings().Get("metrics-server:system:auth-delegator", getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get clusterrolebinding %#q: %v", "metrics-server:system:auth-delegator", err)
-	}
-
-	_, err = c.Rbac().RoleBindings(resourceNamespace).Get("metrics-server-auth-reader", getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get rolebinding %#q/%#q: %v", resourceNamespace, "metrics-server-auth-reader", err)
-	}
-
-	_, err = ac.ApiregistrationV1beta1().APIServices().Get("v1beta1.metrics.k8s.io", getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get apiservice %#q: %v", "v1beta1.metrics.k8s.io", err)
-	}
-
-	_, err = c.Core().ServiceAccounts(resourceNamespace).Get(metricsServerName, getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get service account %#q: %v", "metrics-server", err)
-	}
-
-	_, err = c.Extensions().Deployments(resourceNamespace).Get(metricsServerName, getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get deployment %#q/%#q: %v", resourceNamespace, metricsServerName, getOptions)
-	}
-
-	_, err = c.Core().Services(resourceNamespace).Get(metricsServerName, getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get service %#q/%#q: %v", resourceNamespace, metricsServerName, getOptions)
-	}
-
-	_, err = c.Rbac().ClusterRoles().Get("system:metrics-server", getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get clusterrole %#q: %v", "system:metrics-server", err)
-	}
-
-	_, err = c.Rbac().ClusterRoleBindings().Get("system:metrics-server", getOptions)
-	if err != nil {
-		return microerror.Newf("failed to get clusterrolebinding %#q: %v", "system:metrics-server", err)
-	}
-
-	return nil
-}
-
-func checkLegacyResourcesNotPresent(labelSelector string) error {
-	var err error
-
-	c := h.K8sClient()
-	ac := h.K8sAggregationClient()
-	listOptions := metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("k8s-app=metrics-server,%s", labelSelector),
-	}
-
-	crb, err := c.Rbac().ClusterRoleBindings().List(listOptions)
-	if err == nil && len(crb.Items) > 0 {
-		return microerror.New("expected error querying for legacy clusterrolebindings didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	rb, err := c.Rbac().RoleBindings(resourceNamespace).List(listOptions)
-	if err == nil && len(rb.Items) > 0 {
-		return microerror.New("expected error querying for legacy rolebinding didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	as, err := ac.ApiregistrationV1beta1().APIServices().List(listOptions)
-	if err == nil && len(as.Items) > 0 {
-		return microerror.New("expected error querying for legacy apiservice didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	sa, err := c.Core().ServiceAccounts(resourceNamespace).List(listOptions)
-	if err == nil && len(sa.Items) > 0 {
-		return microerror.New("expected error querying for legacy serviceaccount didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	d, err := c.Extensions().Deployments(resourceNamespace).List(listOptions)
-	if err == nil && len(d.Items) > 0 {
-		return microerror.New("expected error querying for legacy deployment didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	s, err := c.Core().Services(resourceNamespace).List(listOptions)
-	if err == nil && len(s.Items) > 0 {
-		return microerror.New("expected error querying for legacy service didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	cr, err := c.Rbac().ClusterRoles().List(listOptions)
-	if err == nil && len(cr.Items) > 0 {
-		return microerror.New("expected error querying for legacy clusterrole didn't happen")
-	}
-	if !apierrors.IsNotFound(err) {
-		return microerror.Mask(err)
-	}
-
-	return nil
-}
-
-func checkManagedResourcesPresent(labelSelector string) error {
+func checkResourcesPresent(labelSelector string) error {
 	c := h.K8sClient()
 	ac := h.K8sAggregationClient()
 	listOptions := metav1.ListOptions{
@@ -300,7 +182,7 @@ func checkManagedResourcesPresent(labelSelector string) error {
 	return nil
 }
 
-func checkManagedResourcesNotPresent(labelSelector string) error {
+func checkResourcesNotPresent(labelSelector string) error {
 	c := h.K8sClient()
 	ac := h.K8sAggregationClient()
 	listOptions := metav1.ListOptions{
