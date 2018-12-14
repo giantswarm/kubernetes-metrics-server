@@ -32,7 +32,7 @@ func TestMigration(t *testing.T) {
 	ctx := context.Background()
 
 	// Install legacy resources.
-	err := helmClient.InstallFromTarball("/e2e/fixtures/resources-chart", resourceNamespace, helm.ReleaseName("resources"))
+	err := helmClient.InstallReleaseFromTarball(ctx, "/e2e/fixtures/resources-chart", resourceNamespace, helm.ReleaseName("resources"))
 	if err != nil {
 		t.Fatalf("could not install resources chart: %v", err)
 	}
@@ -81,7 +81,7 @@ func TestMigration(t *testing.T) {
 	}
 
 	// Delete release
-	err = helmClient.DeleteRelease(chartName, helm.DeletePurge(true))
+	err = helmClient.DeleteRelease(ctx, chartName, helm.DeletePurge(true))
 	if err != nil {
 		t.Fatalf("failed to teardown resource: %v", err)
 	}
