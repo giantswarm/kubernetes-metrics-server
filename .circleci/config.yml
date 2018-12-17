@@ -109,11 +109,11 @@ workflows:
 
       - e2eTestMetrics:
           requires:
-          - e2eTestBasic
+          - build
 
       - e2eTestMigration:
           requires:
-          - e2eTestBasic
+          - build
 
       - deploy:
           filters:

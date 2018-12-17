@@ -118,12 +118,17 @@ func init() {
 					{
 						Name:      metricsServerName,
 						Namespace: metav1.NamespaceSystem,
-						Labels: map[string]string{
+						DeploymentLabels: map[string]string{
 							"giantswarm.io/service-type": "managed",
-							"app": metricsServerName,
+							"app":                        metricsServerName,
 						},
 						MatchLabels: map[string]string{
 							"app": metricsServerName,
+						},
+						PodLabels: map[string]string{
+							"cluster-autoscaler.kubernetes.io/safe-to-evict": "true",
+							"giantswarm.io/service-type":                     "managed",
+							"app":                                            metricsServerName,
 						},
 						Replicas: 1,
 					},
