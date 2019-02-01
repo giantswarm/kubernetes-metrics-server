@@ -17,8 +17,9 @@ spec:
       maxUnavailable: 1
   template:
     metadata:
-      labels:
+      annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      labels:
         giantswarm.io/service-type: {{ .Values.serviceType }}
         app: {{ .Values.k8sAppLabel }}
     spec:
