@@ -8,12 +8,6 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [v0.3.2]
 
-### Changed
-
-- Auto scaling settings has been adjusted based on past experiences. Now coreDNS responds better to a request peak.
-
-## [v0.4.0]
-
 ### Added 
 
 - Add kubelet-certificate-authority flag
