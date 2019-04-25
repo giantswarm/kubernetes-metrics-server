@@ -8,14 +8,14 @@ and this project's packages adheres to [Semantic Versioning](http://semver.org/s
 
 ## [v0.3.2]
 
-### Added 
-
-- Add kubelet-certificate-authority flag
-
 ### Changed
 
-- Ignore pod not in Running phase
+- Upgrade metric server to the latest version [0.3.2](https://github.com/kubernetes-incubator/metrics-server/releases/tag/v0.3.2). Notable changes there:
 
-- Do not skip unready nodes
+    - Ignore pods not in Running phase
+
+    - Do not skip unready nodes
+
+    - Add kubelet-certificate-authority flag
 
 [0.3.2]: https://github.com/giantswarm/kubernetes-metrics-server/pull/12
