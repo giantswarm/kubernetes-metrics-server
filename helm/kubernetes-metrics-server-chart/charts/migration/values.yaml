@@ -7,6 +7,9 @@ namespace: kube-system
 serviceType: managed
 k8sAppLabel: metrics-server
 
+userID: 1000
+groupID: 1000
+
 image:
   registry: quay.io
   repository: giantswarm/k8s-migrator

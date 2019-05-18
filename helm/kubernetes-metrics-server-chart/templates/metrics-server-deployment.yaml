@@ -24,6 +24,9 @@ spec:
         app: {{ .Values.k8sAppLabel }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        runAsUser: {{ .Values.userID }}
+        runAsGroup: {{ .Values.groupID }}
       priorityClassName: system-cluster-critical
       containers:
         - name: metrics-server
