@@ -24,4 +24,12 @@ rules:
     verbs:
     - get
     - create
+  - apiGroups:
+    - extensions
+    resources:
+    - podsecuritypolicies
+    verbs:
+    - use
+    resourceNames:
+    - {{ .Values.name }}
 {{- end -}}

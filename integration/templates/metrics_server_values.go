@@ -23,6 +23,8 @@ image:
 args:
   - --logtostderr
   - --kubelet-insecure-tls
+  - --cert-dir=/tmp
+  - --secure-port=10443
 resources: {}
 nodeSelector: {}
 tolerations: []
