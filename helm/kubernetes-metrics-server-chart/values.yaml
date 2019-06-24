@@ -10,6 +10,8 @@ k8sAppLabel: metrics-server
 userID: 1000
 groupID: 1000
 
+port: 10443
+
 rbac:
   # Specifies whether RBAC resources should be created
   create: true
