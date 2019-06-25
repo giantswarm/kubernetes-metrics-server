@@ -67,12 +67,6 @@ jobs:
       TEST_NAME: "metrics"
     <<: *e2eTest
 
-  e2eTestMigration:
-    environment:
-      TEST_DIR: "integration/test/migration"
-      TEST_NAME: "migration"
-    <<: *e2eTest
-
   deploy:
     machine: true
     steps:
@@ -108,10 +102,6 @@ workflows:
           - build
 
       - e2eTestMetrics:
-          requires:
-          - build
-
-      - e2eTestMigration:
           requires:
           - build
 
