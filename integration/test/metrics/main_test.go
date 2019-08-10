@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/giantswarm/apprclient"
-	"github.com/giantswarm/e2e-harness/pkg/framework"
-	"github.com/giantswarm/e2e-harness/pkg/framework/deployment"
 	"github.com/giantswarm/e2e-harness/pkg/framework/resource"
 	e2esetup "github.com/giantswarm/e2esetup/chart"
+	"github.com/giantswarm/e2esetup/chart/env"
+	"github.com/giantswarm/e2esetup/k8s"
 	"github.com/giantswarm/e2etests/managedservices"
 	"github.com/giantswarm/helmclient"
 	"github.com/giantswarm/micrologger"
@@ -28,11 +28,11 @@ const (
 
 var (
 	a          *apprclient.Client
-	d          *deployment.Deployment
-	ms         *managedservices.ManagedServices
-	h          *framework.Host
 	helmClient *helmclient.Client
+	k8sSetup   *k8s.Setup
+	k8sClients *k8s.Clients
 	l          micrologger.Logger
+	ms         *managedservices.ManagedServices
 	r          *resource.Resource
 )
 
@@ -48,12 +48,24 @@ func init() {
 	}
 
 	{
-		c := framework.HostConfig{
-			Logger:     l,
-			ClusterID:  "na",
-			VaultToken: "na",
+		c := k8s.ClientsConfig{
+			Logger: l,
+
+			KubeConfigPath: env.KubeConfigPath(),
 		}
-		h, err = framework.NewHost(c)
+		k8sClients, err = k8s.NewClients(c)
+		if err != nil {
+			panic(err.Error())
+		}
+	}
+
+	{
+		c := k8s.SetupConfig{
+			Logger: l,
+
+			Clients: k8sClients,
+		}
+		k8sSetup, err = k8s.NewSetup(c)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -62,8 +74,8 @@ func init() {
 	{
 		c := helmclient.Config{
 			Logger:          l,
-			K8sClient:       h.K8sClient(),
-			RestConfig:      h.RestConfig(),
+			K8sClient:       k8sClients.K8sClient(),
+			RestConfig:      k8sClients.RestConfig(),
 			TillerNamespace: "giantswarm",
 		}
 		helmClient, err = helmclient.New(c)
@@ -91,7 +103,7 @@ func TestMain(m *testing.M) {
 	{
 		c := e2esetup.Config{
 			HelmClient: helmClient,
-			Host:       h,
+			Setup:      k8sSetup,
 		}
 
 		v, err := e2esetup.Setup(ctx, m, c)
