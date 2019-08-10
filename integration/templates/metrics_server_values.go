@@ -28,4 +28,5 @@ args:
 resources: {}
 nodeSelector: {}
 tolerations: []
+e2e: true
 `
