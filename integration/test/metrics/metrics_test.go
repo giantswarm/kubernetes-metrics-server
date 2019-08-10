@@ -4,15 +4,12 @@ package metrics
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
 	"k8s.io/helm/pkg/helm"
 
 	"github.com/giantswarm/backoff"
-	"github.com/giantswarm/e2esetup/chart/env"
-	"github.com/giantswarm/kubernetes-metrics-server/integration/templates"
 	"github.com/giantswarm/microerror"
 )
 
@@ -27,16 +24,10 @@ const (
 func TestMetrics(t *testing.T) {
 	ctx := context.Background()
 
-	// Install resource
-	err := r.Install(chartName, templates.MetricsServerValues, fmt.Sprintf("%s-%s", env.CircleSHA(), testName))
+	// Install chart and wait for deployed status
+	err := ms.Test(ctx)
 	if err != nil {
-		t.Fatalf("could not install resource: %v", err)
-	}
-
-	// Wait for deployed status
-	err = r.WaitForStatus(chartName, "DEPLOYED")
-	if err != nil {
-		t.Fatalf("timeout waiting for deployed resource: %v", err)
+		t.Fatalf("%#v", err)
 	}
 
 	// Check metrics availability
