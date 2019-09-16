@@ -122,7 +122,7 @@ workflows:
       - build
 
       - architect/push-to-app-catalog:
-          name: "package and push kubernetes-metrics-server chart"
+          name: "push-kubernetes-metrics-server-to-app-catalog"
           app_catalog: "giantswarm-catalog"
           app_catalog_test: "giantswarm-test-catalog"
           chart: "kubernetes-metrics-server-chart"
