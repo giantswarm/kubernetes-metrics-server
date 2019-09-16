@@ -1,3 +1,7 @@
+version: 2.1
+orbs:
+  architect: giantswarm/architect@0.2.0
+
 e2eTest: &e2eTest
     machine: true
     working_directory: /home/circleci/.go_workspace/src/github.com/giantswarm/kubernetes-metrics-server
@@ -51,7 +55,6 @@ e2eTest: &e2eTest
           ./architect unpublish --channels=${CIRCLE_SHA1}-${E2E_TEST_NAME}
         when: always
 
-version: 2
 jobs:
   build:
     machine: true
@@ -117,6 +120,16 @@ workflows:
   build_e2e:
     jobs:
       - build
+
+      - architect/push-to-app-catalog:
+          name: "package and push kube-state-metrics-app chart"
+          app_catalog: "giantswarm-catalog"
+          app_catalog_test: "giantswarm-test-catalog"
+          chart: "kube-state-metrics-app"
+          # Trigger job on git tag.
+          filters:
+            tags:
+              only: /^v.*/
 
       - e2eTestBasic:
           requires:
