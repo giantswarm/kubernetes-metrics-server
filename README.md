@@ -1,6 +1,8 @@
 # kubernetes-metrics-server
-Helm chart for Kubernetes Metrics Server running in Tenant Clusters
 
+**DEPRECATED** Changes should be made to https://github.com/giantswarm/metrics-server-app
+
+Helm chart for Kubernetes Metrics Server running in Tenant Clusters
 
 * Installs the [kubernetes-metrics-server](https://github.com/kubernetes-incubator/metrics-server)
 
